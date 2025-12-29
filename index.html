@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="AniFlix - The Ultimate Open Source IPTV Player">
+    <meta name="description" content="AniFlix - The Ultimate IPTV Player by Aniket">
     <meta name="theme-color" content="#0f0f0f">
     <title>AniFlix</title>
 
@@ -14,16 +14,137 @@
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --card: #1e1e1e;
+            --primary: #E50914;
+            --text: #fff;
+            --header-h: 60px;
+        }
+
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding-top: var(--header-h);
+            overflow-x: hidden; user-select: none;
+        }
+
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; right: 0;
+            height: var(--header-h);
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0 4%; z-index: 1000;
+            border-bottom: 1px solid #333;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .logo { color: var(--primary); font-size: 22px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+        
+        .nav-actions button {
+            background: none; border: none; color: #ccc; font-size: 18px; 
+            margin-left: 15px; cursor: pointer; transition: color 0.2s;
+        }
+        .nav-actions button:hover { color: white; }
+
+        /* Controls */
+        .controls {
+            position: sticky; top: var(--header-h); z-index: 900;
+            background: var(--bg); padding: 15px 4%;
+            border-bottom: 1px solid #222;
+            display: flex; flex-wrap: wrap; gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .control-group { flex: 1; min-width: 140px; }
+        .label { font-size: 11px; color: #888; margin-bottom: 4px; display: block; font-weight: 600; text-transform: uppercase; }
+
+        select, input, button {
+            width: 100%; background: #222; border: 1px solid #333; color: white;
+            padding: 10px 12px; border-radius: 6px; outline: none; font-size: 14px; height: 42px;
+        }
+        
+        .btn-go {
+            background: var(--primary); border: none; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* Grid */
+        .grid {
+            padding: 20px 4% 80px 4%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px; min-height: 60vh;
+        }
+
+        .card {
+            background: var(--card); border-radius: 8px; overflow: hidden;
+            aspect-ratio: 16/9; cursor: pointer; position: relative;
+            animation: fadeIn 0.4s ease; border: 1px solid transparent;
+        }
+        .card:hover { border-color: #444; }
+        
+        .card img { width: 100%; height: 100%; object-fit: contain; background: #000; }
+        .card-meta {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.95));
+            padding: 8px 10px;
+        }
+        .card-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Status & Modals */
+        .status-area { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #666; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .spinner { width: 30px; height: 30px; border: 3px solid #333; border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Player Modal */
+        #player { position: fixed; inset: 0; background: black; z-index: 2000; display: none; flex-direction: column; }
+        .p-head { padding: 15px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; }
+        .close-btn { background: #333; border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; flex: 1; background: black; }
+
+        /* About Modal */
+        .about-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000;
+            display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px);
+        }
+        .about-card {
+            background: #1a1a1a; max-width: 400px; width: 100%; border-radius: 12px;
+            padding: 30px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .about-title { font-size: 24px; font-weight: 900; color: var(--primary); margin-bottom: 10px; letter-spacing: 1px; }
+        .about-text { color: #ccc; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        .social-links { display: flex; gap: 15px; justify-content: center; margin-bottom: 25px; }
+        .social-btn {
+            width: 45px; height: 45px; border-radius: 50%; background: #333; color: white;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
+            text-decoration: none; transition: 0.2s;
+        }
+        .social-btn:hover { background: var(--primary); transform: translateY(-3px); }
+        .credits { font-size: 12px; color: #666; border-top: 1px solid #333; padding-top: 15px; }
+        .credits a { color: #888; text-decoration: none; }
+
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: #333; padding: 12px 25px; border-radius: 50px;
+            font-size: 13px; display: none; z-index: 4000;
+        }
+    </style>
 </head>
 <body>
 
     <header>
         <div class="logo">ANIFLIX</div>
         <div class="nav-actions">
-            <button onclick="toggleAbout()" aria-label="About"><i class="fas fa-info-circle"></i></button>
+            <button onclick="toggleAbout()"><i class="fas fa-info-circle"></i></button>
         </div>
     </header>
 
@@ -37,21 +158,18 @@
                 <option value="region">Region</option>
             </select>
         </div>
-        
         <div class="control-group">
             <span class="label">Select Option</span>
             <select id="subSelect">
                 <option value="">Loading API...</option>
             </select>
         </div>
-
         <div class="control-group" style="flex: 0 0 100px;">
             <span class="label">&nbsp;</span>
             <button class="btn-go" onclick="loadSelectedPlaylist()">
                 <i class="fas fa-play"></i> LOAD
             </button>
         </div>
-        
         <input type="text" id="localSearch" placeholder="Search loaded channels..." style="margin-top: 10px; display:none;" oninput="filterLoadedChannels()">
     </div>
 
@@ -92,14 +210,181 @@
             </div>
 
             <div class="credits">
-                Data provided by <a href="https://github.com/iptv-org" target="_blank">iptv-org</a>.
+                Data provided by <a href="https://github.com/iptv-org" target="_blank">iptv-org</a>.<br>
+                Code available on <a href="https://github.com/aniketuv" target="_blank">GitHub</a>.
             </div>
             
-            <button onclick="toggleAbout()" class="btn-close-modal">Close</button>
+            <button onclick="toggleAbout()" style="margin-top:20px; background:#333; border:none; color:white; padding:8px 20px; border-radius:4px; cursor:pointer;">Close</button>
         </div>
     </div>
 
-    <div id="toast">Notification</div>
+    <div id="toast">Stream is offline</div>
 
+    <script>
+        // Config
+        const PROXY = 'https://api.allorigins.win/raw?url=';
+        const API_BASE = 'https://iptv-org.github.io/api';
+        const M3U_BASE = 'https://iptv-org.github.io/iptv';
+
+        let state = { channels: [], hls: null };
+
+        // Init
+        window.onload = loadMetaData;
+
+        // 1. Data Loading
+        let db = {};
+        async function loadMetaData() {
+            try {
+                const [cats, countr, langs, regs] = await Promise.all([
+                    fetch(`${API_BASE}/categories.json`).then(r => r.json()),
+                    fetch(`${API_BASE}/countries.json`).then(r => r.json()),
+                    fetch(`${API_BASE}/languages.json`).then(r => r.json()),
+                    fetch(`${API_BASE}/regions.json`).then(r => r.json())
+                ]);
+
+                db = { categories: cats, countries: countr, languages: langs, regions: regs };
+                updateSubFilter();
+            } catch(e) { console.error("API Error"); }
+        }
+
+        // 2. UI Logic
+        function updateSubFilter() {
+            const mode = document.getElementById('modeSelect').value;
+            const sub = document.getElementById('subSelect');
+            sub.innerHTML = '';
+            
+            let data = [];
+            if(mode === 'category') data = db.categories.map(c => ({ id: c.id, name: c.name }));
+            if(mode === 'country') data = db.countries.map(c => ({ id: c.code.toLowerCase(), name: c.name }));
+            if(mode === 'language') data = db.languages.map(c => ({ id: c.code, name: c.name }));
+            if(mode === 'region') data = db.regions.map(c => ({ id: c.code.toLowerCase(), name: c.name }));
+
+            data.sort((a,b) => a.name.localeCompare(b.name));
+            
+            data.forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i.id; opt.innerText = i.name;
+                sub.appendChild(opt);
+            });
+            
+            // Defaults
+            if(mode === 'category') sub.value = 'animation';
+            if(mode === 'region') sub.value = 'eur';
+        }
+
+        async function loadSelectedPlaylist() {
+            const mode = document.getElementById('modeSelect').value;
+            const id = document.getElementById('subSelect').value;
+            if(!id) return;
+
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '<div class="status-area"><div class="spinner"></div><div>Loading Channels...</div></div>';
+            document.getElementById('localSearch').style.display = 'none';
+
+            let folder = 'categories';
+            if(mode === 'country') folder = 'countries';
+            if(mode === 'language') folder = 'languages';
+            if(mode === 'region') folder = 'regions';
+
+            try {
+                const url = PROXY + encodeURIComponent(`${M3U_BASE}/${folder}/${id}.m3u`);
+                const res = await fetch(url);
+                if(!res.ok) throw new Error();
+                const text = await res.text();
+                
+                state.channels = parseM3U(text);
+                
+                if(state.channels.length === 0) {
+                    grid.innerHTML = '<div class="status-area">No channels found.</div>';
+                    return;
+                }
+                
+                renderGrid(state.channels);
+                document.getElementById('localSearch').style.display = 'block';
+                document.getElementById('localSearch').value = '';
+
+            } catch(e) {
+                grid.innerHTML = '<div class="status-area">Failed to load list. Try another.</div>';
+            }
+        }
+
+        function parseM3U(data) {
+            const lines = data.split('\n');
+            const result = [];
+            let item = {};
+            lines.forEach(line => {
+                line = line.trim();
+                if(line.startsWith('#EXTINF:')) {
+                    const info = line.substring(8);
+                    item.name = info.split(',').pop().trim();
+                    item.logo = (info.match(/tvg-logo="([^"]*)"/)||[])[1];
+                } else if(line.startsWith('http') && item.name) {
+                    item.url = line;
+                    result.push(item);
+                    item = {};
+                }
+            });
+            return result;
+        }
+
+        function renderGrid(list) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = '';
+            
+            list.slice(0, 500).forEach(c => {
+                const el = document.createElement('div');
+                el.className = 'card';
+                el.innerHTML = `<img src="${c.logo || ''}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3845/3845722.png'"><div class="card-meta"><div class="card-title">${c.name}</div></div>`;
+                el.onclick = () => play(c);
+                grid.appendChild(el);
+            });
+        }
+
+        function filterLoadedChannels() {
+            const term = document.getElementById('localSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(c => {
+                const name = c.querySelector('.card-title').textContent.toLowerCase();
+                c.style.display = name.includes(term) ? 'block' : 'none';
+            });
+        }
+
+        // --- Player ---
+        function play(c) {
+            document.getElementById('player').style.display = 'flex';
+            document.getElementById('pTitle').innerText = c.name;
+            const vid = document.getElementById('video');
+
+            if(Hls.isSupported()) {
+                if(state.hls) state.hls.destroy();
+                state.hls = new Hls();
+                state.hls.loadSource(c.url);
+                state.hls.attachMedia(vid);
+                state.hls.on(Hls.Events.MANIFEST_PARSED, () => vid.play());
+                state.hls.on(Hls.Events.ERROR, (e,d) => { if(d.fatal) showToast('Stream Error'); });
+            } else if(vid.canPlayType('application/vnd.apple.mpegurl')) {
+                vid.src = c.url; vid.play();
+            }
+        }
+
+        function closePlayer() {
+            document.getElementById('player').style.display = 'none';
+            document.getElementById('video').pause();
+            if(state.hls) state.hls.destroy();
+        }
+
+        // --- Modals ---
+        function toggleAbout() {
+            const m = document.getElementById('aboutModal');
+            m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+    </script>
 </body>
 </html>
+
