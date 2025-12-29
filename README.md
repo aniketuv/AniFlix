@@ -4,6 +4,8 @@
 
 AniFlix is a modern PWA (Progressive Web App) that lets you stream thousands of live global TV channels directly in your browser. No ads, no sign-ups, just free TV.
 
+### 🔴 [Click Here to Watch Live (Demo)](https://aniketuv.github.io/AniFlix/)
+
 ### ✨ Key Features
 * **Global Access:** Filter by Country, Region, Language, or Category.
 * **App Experience:** Installable as a Native App (PWA) on iOS/Android.
@@ -24,3 +26,4 @@ AniFlix is a modern PWA (Progressive Web App) that lets you stream thousands of 
 
 ---
 *Credits: Data provided by [iptv-org](https://github.com/iptv-org). This project acts only as a player and hosts no content.*
+
