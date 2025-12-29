@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="AniFlix - The Ultimate Open Source IPTV Player">
+    <meta name="theme-color" content="#0f0f0f">
+    <title>AniFlix</title>
+
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22AniFlix%22%2C%22short_name%22%3A%22AniFlix%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f0f0f%22%2C%22theme_color%22%3A%22%230f0f0f%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F2989%2F2989835.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D'>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2989/2989835.png">
+
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.4.0/dist/hls.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+
+    <header>
+        <div class="logo">ANIFLIX</div>
+        <div class="nav-actions">
+            <button onclick="toggleAbout()" aria-label="About"><i class="fas fa-info-circle"></i></button>
+        </div>
+    </header>
+
+    <div class="controls">
+        <div class="control-group">
+            <span class="label">Filter By</span>
+            <select id="modeSelect" onchange="updateSubFilter()">
+                <option value="category">Category</option>
+                <option value="country">Country</option>
+                <option value="language">Language</option>
+                <option value="region">Region</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <span class="label">Select Option</span>
+            <select id="subSelect">
+                <option value="">Loading API...</option>
+            </select>
+        </div>
+
+        <div class="control-group" style="flex: 0 0 100px;">
+            <span class="label">&nbsp;</span>
+            <button class="btn-go" onclick="loadSelectedPlaylist()">
+                <i class="fas fa-play"></i> LOAD
+            </button>
+        </div>
+        
+        <input type="text" id="localSearch" placeholder="Search loaded channels..." style="margin-top: 10px; display:none;" oninput="filterLoadedChannels()">
+    </div>
+
+    <div class="grid" id="grid">
+        <div class="status-area">
+            <div style="font-size: 40px; margin-bottom: 10px;">📺</div>
+            <div style="font-weight: bold; color: white;">Welcome to AniFlix</div>
+            <div style="font-size: 13px;">Select a Category, Country, or Region to start watching.</div>
+        </div>
+    </div>
+
+    <div id="player">
+        <div class="p-head">
+            <h4 id="pTitle" style="margin:0; color:white;">Channel</h4>
+            <button class="close-btn" onclick="closePlayer()"><i class="fas fa-times"></i></button>
+        </div>
+        <video id="video" controls playsinline></video>
+    </div>
+
+    <div class="about-overlay" id="aboutModal" onclick="if(event.target===this) toggleAbout()">
+        <div class="about-card">
+            <div class="about-title">ANIFLIX</div>
+            <div class="about-text">
+                The ultimate open-source IPTV player.<br>
+                Designed and Developed by <strong>Aniket</strong>.
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.instagram.com/aniketuv?igsh=aHoxOTZmdWx3ZzBo" target="_blank" class="social-btn" title="Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/aniketuv?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-btn" title="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://github.com/aniketuv" target="_blank" class="social-btn" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+
+            <div class="credits">
+                Data provided by <a href="https://github.com/iptv-org" target="_blank">iptv-org</a>.
+            </div>
+            
+            <button onclick="toggleAbout()" class="btn-close-modal">Close</button>
+        </div>
+    </div>
+
+    <div id="toast">Notification</div>
+
+</body>
+</html>
